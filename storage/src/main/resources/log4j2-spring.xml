@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--日志级别以及优先级排序: OFF > FATAL > ERROR > WARN > INFO > DEBUG > TRACE > ALL -->
+<!--Configuration后面的status，这个用于设置log4j2自身内部的信息输出，可以不设置，当设置成trace时，你会看到log4j2内部各种详细输出-->
+<!--monitorInterval：Log4j能够自动检测修改配置 文件和重新配置本身，设置间隔秒数-->
+<Configuration status="WARN" monitorInterval="30">
+    <!--全局属性-->
+    <Properties>
+        <Property name="LOG_FILE_PATH">D:/STORAGE_LOGS</Property>
+        <Property name="PATTERN_FORMAT">%d{yyyy-MM-dd HH:mm:ss} [%-5level] %class{36} - %msg%xEx%n</Property>
+    </Properties>
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${PATTERN_FORMAT}"/>
+        </Console>
+        <RollingFile name="RollingErrorFile" fileName="${LOG_FILE_PATH}/error.log"
+                     filePattern="${LOG_FILE_PATH}/$${date:yyyyMM}/error-%d{yyyyMMdd}-%i.log">
+            <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout>
+                <pattern>${PATTERN_FORMAT}</pattern>
+            </PatternLayout>
+            <Policies>
+                <OnStartupTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="5 MB"/>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <Root level="INFO">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="RollingErrorFile"/>
+        </Root>
+        <!-- 记录系统执行过的sql语句 -->
+        <logger name="jdbc.sqlonly" level="OFF"/>
+        <!-- 记录sql执行的时间，可以分析耗时的sql语句 -->
+        <logger name="jdbc.sqltiming" level="INFO"/>
+        <!-- 记录返回结果集信息 -->
+        <logger name="jdbc.resultset" level="OFF"/>
+        <!-- 记录数据库连接和释放信息，可记录当前的数据库连接数，便于诊断连接是否释放 -->
+        <logger name="jdbc.connection" level="OFF"/>
+        <!-- 记录除了ResultSet外的所有JDBC调用情况，一般不需要 -->
+        <logger name="jdbc.audit" level="OFF"/>
+    </Loggers>
+</Configuration>
